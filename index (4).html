@@ -50,9 +50,12 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 .hero{padding-block:28px 8px;display:grid;gap:14px}
 .hero h1{font-size:clamp(28px,5vw,42px);line-height:1.15}
 .hero p{margin:0;max-width:62ch;color:var(--muted)}
-.recap{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;gap:10px}
-.recap ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
-.recap li{background:var(--brand-soft);color:var(--ink);border-radius:999px;padding:4px 12px;font-size:14px}
+.info{border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;width:100%;max-width:520px}
+.info th,.info td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);font-size:15px}
+.info tr:last-child th,.info tr:last-child td{border-bottom:0}
+.info th{width:42%;font-weight:600;color:var(--muted);background:var(--brand-soft)}
+.info td{font-weight:600;overflow-wrap:anywhere}
+.fact.deadline dd{color:var(--urgent)}
 
 section{margin-top:36px}
 .sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
@@ -144,7 +147,7 @@ const TODAY = new Date(); TODAY.setHours(0,0,0,0);
 const parseDate = d => new Date(d + "T00:00:00");
 const fmtDate = d => parseDate(d).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
 const daysLeft = d => Math.round((parseDate(d) - TODAY) / 86400000);
-const fitLabel = {strong:"Strong fit", good:"Good fit", stretch:"Worth considering"};
+const fitLabel = {strong:"Ideal fit", good:"Good fit", stretch:"Worth considering"};
 const fitRank = {strong:0, good:1, stretch:2};
 
 /* ---------- Read the shortlist from the link ---------- */
@@ -184,10 +187,11 @@ app.innerHTML = `
     <div class="valid ${expired?'expired':''}">${esc(validTxt)}</div>
   </header>
   <div class="hero">
-    <div class="eyebrow">Your tender shortlist</div>
-    <h1>Hi ${esc(data.contact)}, here ${n===1?'is the opportunity':'are '+n+' opportunities'} we found for ${esc(data.org)}</h1>
-    <p>Thank you for your discovery call. We've searched current tenders, frameworks and Dynamic Purchasing Systems that match the service you described. Take a look, choose any you'd like support with, and we'll take it from there. There's no obligation.</p>
-    ${data.tags && data.tags.length ? `<div class="recap"><div class="eyebrow">What you told us</div><ul>${data.tags.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>` : ""}
+    <h1>Tender shortlist</h1>
+    <table class="info">
+      <tr><th scope="row">Organisation</th><td>${esc(data.org)}</td></tr>
+      <tr><th scope="row">Point of contact</th><td>${esc(data.contact)}</td></tr>
+    </table>
   </div>
   <section>
     <div class="sec-head"><h2>Deadlines at a glance</h2><span class="small">Today: ${TODAY.toLocaleDateString("en-GB",{day:"numeric",month:"long"})}</span></div>
@@ -221,7 +225,7 @@ function countdown(d){
   const k = daysLeft(d);
   if (k < 0) return '<span class="count soon">Closed</span>';
   if (k === 0) return '<span class="count soon">Closes today</span>';
-  return `<span class="count ${k<=21?'soon':'ok'}">${k} day${k===1?'':'s'} left</span>`;
+  return `<span class="count soon">${k} day${k===1?'':'s'} left</span>`;
 }
 
 function renderCards(){
@@ -239,12 +243,11 @@ function renderCards(){
       </div>
       <dl class="facts">
         ${facts.map(f=>`<div class="fact"><dt>${f[0]}</dt><dd>${esc(f[1])}</dd></div>`).join("")}
-        ${t.deadline?`<div class="fact"><dt>Deadline</dt><dd>${fmtDate(t.deadline)}<br>${countdown(t.deadline)}</dd></div>`:''}
+        ${t.deadline?`<div class="fact deadline"><dt>Deadline</dt><dd>${fmtDate(t.deadline)}<br>${countdown(t.deadline)}</dd></div>`:''}
       </dl>
-      ${t.why?`<p class="why"><strong>Why it fits you.</strong> ${esc(t.why)}</p>`:''}
       ${t.needs.length?`<details><summary>What we'd need from you</summary><ul>${t.needs.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:''}
       <div class="card-foot">
-        <div class="fee"><small>Our fee to write this bid</small><strong>${money(t.fee)}</strong></div>
+        <div class="fee"><small>Fee</small><strong>${money(t.fee)}</strong></div>
         <button type="button" class="btn ${on?'on':''}" data-id="${t.id}" aria-pressed="${on}" ${(confirmed||closed||expired)?'disabled':''}>${closed?'Closed':on?'✓ Selected':'Select this tender'}</button>
       </div>
     </article>`;
