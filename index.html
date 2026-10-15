@@ -80,7 +80,7 @@ section{margin-top:36px}
 .fit-strong{background:var(--brand-soft);color:var(--strong)}
 .fit-good{background:var(--brand-soft);color:var(--good)}
 .fit-stretch{background:var(--gold-soft);color:var(--stretch)}
-.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-radius:10px;overflow:hidden;border:1px solid var(--line);margin:0}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border-radius:10px;overflow:hidden;border:1px solid var(--line);margin:0}
 .fact{background:var(--surface);padding:10px 12px;min-width:0}
 .fact dt{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
 .fact dd{margin:2px 0 0;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
@@ -235,7 +235,7 @@ function renderCards(){
   document.getElementById("cards").innerHTML = list.map(t=>{
     const on = selected.has(t.id);
     const closed = t.deadline && daysLeft(t.deadline) < 0;
-    const facts = [["Route",t.route],["Value",t.value],["Length",t.length]].filter(f=>f[1]);
+    const facts = [["Service type",t.service],["Hourly rate",t.rate],["Route",t.route],["Value",t.value],["Length",t.length]].filter(f=>f[1]);
     return `<article class="card ${on?'selected':''}">
       <div class="card-top">
         <div><h3>${esc(t.title)}</h3><div class="buyer">${esc(t.buyer)}${t.lot?' · '+esc(t.lot):''}</div></div>
@@ -329,7 +329,7 @@ async function send(picks, total){
   const note = document.getElementById("note").value.trim();
   const th = 'padding:10px 12px;font-family:Arial,sans-serif;font-size:12px;color:#3e554f;text-transform:uppercase;letter-spacing:1px;';
   const rowsHtml = picks.map(t=>`<tr>
-      <td style="padding:10px 12px;border-bottom:1px solid #dbe2dd;color:#1f2b27;font-family:Arial,sans-serif;font-size:14px;"><strong>${esc(t.title)}</strong><br><span style="color:#5d6b66;">${esc(t.buyer)}${t.lot?' · '+esc(t.lot):''}</span></td>
+      <td style="padding:10px 12px;border-bottom:1px solid #dbe2dd;color:#1f2b27;font-family:Arial,sans-serif;font-size:14px;"><strong>${esc(t.title)}</strong><br><span style="color:#5d6b66;">${esc(t.buyer)}${t.lot?' · '+esc(t.lot):''}${t.service?'<br>'+esc(t.service):''}${t.rate?' · '+esc(t.rate):''}</span></td>
       <td style="padding:10px 12px;border-bottom:1px solid #dbe2dd;color:#1f2b27;font-family:Arial,sans-serif;font-size:14px;white-space:nowrap;">${t.deadline?fmtDate(t.deadline):'n/a'}</td>
       <td style="padding:10px 12px;border-bottom:1px solid #dbe2dd;color:#1f2b27;font-family:Arial,sans-serif;font-size:14px;text-align:right;white-space:nowrap;">${money(t.fee)}</td>
     </tr>`).join("");
